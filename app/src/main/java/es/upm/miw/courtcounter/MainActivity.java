@@ -1,19 +1,15 @@
 package es.upm.miw.courtcounter;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private int scoreTeamA = 0;
-    private int scoreTeamB = 0;
-    private static final String TEAM_A = "A";
-    private static final String TEAM_B = "B";
+    ScoreViewModel scoreViewModel;
     private TextView teamAscoreView;
     private TextView teamBscoreView;
 
@@ -21,29 +17,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        scoreViewModel = ViewModelProviders.of(this).get(ScoreViewModel.class);
 
         teamAscoreView = findViewById(R.id.teamAscore);
         teamBscoreView = findViewById(R.id.teamBscore);
         displayScoreTeamA();
         displayScoreTeamB();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putInt(TEAM_A, scoreTeamA);
-        savedInstanceState.putInt(TEAM_B, scoreTeamB);
-        super.onSaveInstanceState(savedInstanceState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if(savedInstanceState!=null) {
-            scoreTeamA = savedInstanceState.getInt(TEAM_A);
-            scoreTeamB = savedInstanceState.getInt(TEAM_B);
-            displayScoreTeamA();
-            displayScoreTeamB();
-        }
     }
 
     public void pointsTeamA(View v) {
@@ -55,28 +34,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void resetScores(View v) {
-        scoreTeamA = 0;
-        scoreTeamB = 0;
+        scoreViewModel.setScoreTeamA(0);
+        scoreViewModel.setScoreTeamB(0);
         displayScoreTeamA();
         displayScoreTeamB();
     }
 
     private void updateTeamScore(String team, String buttonLabel) {
         if(team.equals("A")) {
-            scoreTeamA += getButtonPoint(buttonLabel);
+            scoreViewModel.setScoreTeamA(
+                    scoreViewModel.getScoreTeamA() + getButtonPoint(buttonLabel));
             displayScoreTeamA();
         } else if(team.equals("B")) {
-            scoreTeamB += getButtonPoint(buttonLabel);
+            scoreViewModel.setScoreTeamB(
+                    scoreViewModel.getScoreTeamB() + getButtonPoint(buttonLabel));
             displayScoreTeamB();
         }
     }
 
     private void displayScoreTeamA() {
-        teamAscoreView.setText(String.valueOf(scoreTeamA));
+        teamAscoreView.setText(String.valueOf(scoreViewModel.getScoreTeamA()));
     }
 
     private void displayScoreTeamB() {
-        teamBscoreView.setText(String.valueOf(scoreTeamB));
+        teamBscoreView.setText(String.valueOf(scoreViewModel.getScoreTeamB()));
 
     }
 
